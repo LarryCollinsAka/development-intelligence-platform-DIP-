@@ -29,6 +29,34 @@ services:
     networks:
       - platform
 
+  redis:
+    image: redis:${REDIS_VERSION}-bookworm
+    container_name: dip-dev-redis
+    restart: unless-stopped
+
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    networks:
+      - platform
+
 networks:
 
   platform:
@@ -37,3 +65,4 @@ networks:
 volumes:
 
   postgres_data:
+  redis_data:
